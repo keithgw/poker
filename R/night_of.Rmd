@@ -1,0 +1,78 @@
+---
+title: "night of"
+author: "Keith"
+date: "5/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+source("./R/helper_functions.R")
+source("./R/constants.R")
+```
+
+# Pre-game
+
+```{r}
+# read in ledger
+starting_ledger <- empty_ledger
+```
+
+```{r}
+player_balance(starting_ledger) %>% knitr::kable()
+```
+
+# During Game
+
+## Ledger
+
+```{r}
+# nightly ledger
+tonight_date <- "2020-05-27"
+tonight <- empty_ledger
+```
+
+## Chip Values
+
+```{r}
+chips <- tribble(
+    ~player,  ~chips,
+    "keith",  0,
+    "dustin", 0,
+    "devon",  0,
+    "hanson", 0
+)
+
+(total_chips <- sum(chips$chips))
+(pot <- get_money_on_table(tonight))
+big_blind <- 100
+
+# calculate a $40 buyin in chips
+calculate_buyin(total_chips, pot, 40)
+
+# calculate minimum buyin value
+value_chips(total_chips, pot, chips = 4000)
+
+# calculate big blind value
+value_chips(total_chips, pot, chips = big_blind)
+
+# table balance
+chips_to_dollars(chips, pot) %>% 
+    knitr::kable()
+```
+
+# Post-Game
+
+```{r}
+# new balance
+bind_rows(starting_ledger, tonight) %>%
+    player_balance() %>% 
+    knitr::kable()
+
+
+# Write tonight's transactions to the ledger
+
+# Write the player aggregated balance to the ledger
+```
+

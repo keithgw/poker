@@ -3,20 +3,23 @@ title: "night of"
 author: "Keith"
 date: "5/27/2020"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-source("./R/helper_functions.R")
-source("./R/constants.R")
+source("helper_functions.R")
+source("constants.R")
+googlesheets4::gs4_auth(email = "keith.gordon.williams@gmail.com", use_oob = TRUE)
 ```
 
 # Pre-game
 
 ```{r}
 # read in ledger
-starting_ledger <- empty_ledger
+starting_ledger <- googlesheets4::read_sheet(sheet_path, sheet = "ledger")
 ```
 
 ```{r}
@@ -65,14 +68,21 @@ chips_to_dollars(chips, pot) %>%
 # Post-Game
 
 ```{r}
+# confirm transactions look right
+knitr::kable(tonight)
+
 # new balance
-bind_rows(starting_ledger, tonight) %>%
-    player_balance() %>% 
-    knitr::kable()
+balance <- bind_rows(starting_ledger, tonight) %>%
+    player_balance()
 
+knitr::kable(balance)
+```
 
+```{r}
 # Write tonight's transactions to the ledger
+googlesheets4::sheet_append(sheet_path, tonight, sheet = "ledger")
 
 # Write the player aggregated balance to the ledger
+googlesheets4::write_sheet(balance, sheet_path, sheet = "balance")
 ```
 
